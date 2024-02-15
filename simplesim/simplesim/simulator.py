@@ -27,12 +27,11 @@ current_speed = float(0) #m/s
 path = []
 # path_publisher = PathPublisher()
 
-class Publisher(Node):
-    def __init__(self, wps):
-        super().__init__('simulator')
+drone_id = 'x'
 
-        self.drone_id = self.declare_parameter(
-            'drone_id', '0').get_parameter_value().string_value
+class Publisher(Node):
+    def __init__(self, wps, drone_id):
+        super().__init__('simulator')
 
         self.publisher_ = self.create_publisher(PoseStamped, 'pose', 1)
 
@@ -42,18 +41,19 @@ class PathPublisher(Node):
     def __init__(self):
         super().__init__('path')
 
-        self.publisher_ = self.create_publisher(Path, 'path', 1)
+        self.publisher_ = self.create_publisher(Path, 'path_', 1)
 
 class Subscriber(Node):
     def __init__(self):
         super().__init__('sim_listener')
 
-        self.subscription = self.create_subscription(Waypoints,'wps',self.startup,1)
+        self.subscription = self.create_subscription(Waypoints,'wps', self.startup, 1)
         self.subscription
 
     def startup(self,msg):
         wps = msg.wps
-        pose_publisher = Publisher(wps)
+        drone_id = msg.drone_id
+        pose_publisher = Publisher(wps, drone_id)
         rclpy.spin(pose_publisher)
 
 def start(selfa, current_wp: PoseStamped, waypoints: list[PoseStamped]):

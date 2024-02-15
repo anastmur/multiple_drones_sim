@@ -9,18 +9,19 @@ class WpsPublisher(Node):
         super().__init__('wps_publisher')
 
         self.drone_id = self.declare_parameter(
-            'drone_id', '0').get_parameter_value().string_value
+            'drone_id', 'x').get_parameter_value().string_value
 
         self.publisher_ = self.create_publisher(Waypoints, 'wps', 1)
-        self.send_msg()
+        self.send_msg(drone_id)
 
-    def send_msg(self):
-        wps = self.prueba1()
+    def send_msg(self, drone_id):
+        wps = self.random()
 
         time.sleep(0.5)
 
         wps_msg = Waypoints()
         wps_msg.wps = wps
+        drone_id = str(wps_msg.drone_id)
 
         self.publisher_.publish(wps_msg)
 

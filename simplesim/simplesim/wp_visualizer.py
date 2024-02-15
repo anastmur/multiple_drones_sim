@@ -12,25 +12,34 @@ import random
 class WpSubscriber(Node):
     def __init__(self):
         super().__init__('vis_listener')
+        
+        # logger.debug('wps_' + drone_id)
+
+        drone_id = self.declare_parameter(
+            'drone_id', 'x').get_parameter_value().string_value
 
         self.subscription = self.create_subscription(Waypoints,'wps',self.visualize,1)
         self.subscription
 
     def visualize(self,msg):
-        pose_publisher = MarkerPublisher(msg.wps)
+        pose_publisher = MarkerPublisher(msg.wps, msg.drone_id)
         rclpy.spin(pose_publisher)
 
 class MarkerPublisher(Node):
-    def __init__(self, wps):
+    def __init__(self, wps, drone_id):
         super().__init__('wp_vis')
 
-        # self.drone_id = self.declare_parameter(
-        #     'drone_id', '0').get_parameter_value().string_value
+        # logger.debug('wps_' + drone_id)
 
         self.publisher_ = self.create_publisher(Marker, 'marker', 100)
 
         i = 0
         before = None
+        
+        red = random.random()
+        blue = random.random()
+        green = random.random()
+
         for wp in wps:
             m = Marker()
             m.ns = "wp_vis"
@@ -40,8 +49,8 @@ class MarkerPublisher(Node):
             m.scale.x = 1.5
             m.scale.y = 1.5
             m.scale.z = 1.5
-            m.color.a = 1.5
-            m.color.r = 1.5
+            m.color.a = 1.0
+            m.color.r = 1.0
             m.id = i
 
             if before != None:
@@ -53,8 +62,9 @@ class MarkerPublisher(Node):
                 l.action = Marker.ADD
                 l.scale.x = 0.5
                 l.color.a = 1.0
-                l.color.r = 1.0
-                l.color.b = 1.0
+                l.color.r = red
+                l.color.b = blue
+                l.color.g = green
                 l.id = i
                 points = []
                 pointA = Point()
