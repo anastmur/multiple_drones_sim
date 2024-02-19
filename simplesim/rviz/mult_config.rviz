@@ -60,6 +60,27 @@ Visualization Manager:
       Name: Path
       Topic: path_1
       Value: True
+    - Class: rviz_default_plugins/Pose
+      Name: Pose
+      Shape: Axes
+      Axes Length: 2
+      Axes Radius: 1
+      Value: true
+      Topic: drone_2/pose
+      Color: (255,255,255)
+    - Class: rviz_default_plugins/Marker
+      Name: Marker
+      Topic: drone_2/marker
+      Value: True
+    - Class: rviz_default_plugins/PointStamped
+      Name: PointStamped
+      Topic: drone_2/point
+      Value: True
+      Radius: 0.5
+    - Class: rviz_default_plugins/Path
+      Name: Path
+      Topic: path_1
+      Value: True
   Global Options:
     Fixed Frame: base_link
   Tools:
