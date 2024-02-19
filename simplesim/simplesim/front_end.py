@@ -89,8 +89,6 @@ class WpsPublisher(Node):
         return poses
 
 def main():
-    # between = input("Meter in between points")
-    # number = input("number of points")
     rclpy.init()
     wps_publisher = WpsPublisher()
     rclpy.spin(wps_publisher)
