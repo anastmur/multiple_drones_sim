@@ -56,7 +56,7 @@ class Subscriber(Node):
         pose_publisher = Publisher(wps, drone_id)
         rclpy.spin(pose_publisher)
 
-def start(selfa, current_wp: PoseStamped, waypoints: list[PoseStamped]):
+def start(publisher, current_wp: PoseStamped, waypoints: list[PoseStamped]):
     """
     Takes in the desired waypoints,
     processes a path in real time and makes
@@ -67,15 +67,15 @@ def start(selfa, current_wp: PoseStamped, waypoints: list[PoseStamped]):
     # Calculate direction of first waypoint
     current_direction = calculate_direction(current_wp, waypoints[0])
 
-    print_vec(current_direction, selfa)
+    print_vec(current_direction, publisher)
 
     for next_wp in waypoints[:-1]:
         subsequent = waypoints[waypoints.index(next_wp)+1]
-        current_wp = approach(selfa, current_wp, next_wp, subsequent)
-        current_wp = overtake(selfa, current_wp, subsequent)
-    finish(selfa, current_wp, waypoints[-1]) # Last point
+        current_wp = approach(publisher, current_wp, next_wp, subsequent)
+        current_wp = overtake(publisher, current_wp, subsequent)
+    finish(publisher, current_wp, waypoints[-1]) # Last point
 
-def approach(selfa, current, next_wp, subsequent) -> PoseStamped:
+def approach(publisher, current, next_wp, subsequent) -> PoseStamped:
     """
     Approaches next point from
     current point in a straight line
@@ -106,7 +106,7 @@ def approach(selfa, current, next_wp, subsequent) -> PoseStamped:
         print("SPEED")
         print(str(current_speed))
         print("DIRECTION")
-        print_vec(current_direction, selfa)
+        print_vec(current_direction, publisher)
 
         next_pose = PoseStamped()
         next_pose.pose.position.x = current.pose.position.x + current_direction.x * (current_speed*TIME_STEP)
@@ -114,11 +114,11 @@ def approach(selfa, current, next_wp, subsequent) -> PoseStamped:
         next_pose.pose.position.z = current.pose.position.z + current_direction.z * (current_speed*TIME_STEP)
 
         print("POSITION")
-        print_point(next_pose, selfa)
+        print_point(next_pose, publisher)
         print("")
         next_pose.header.frame_id = "base_link"
 
-        selfa.publisher_.publish(next_pose)
+        publisher.publisher_.publish(next_pose)
         path.append(next_pose)
         new_path = Path()
         new_path.header.frame_id = "base_link"
@@ -130,7 +130,7 @@ def approach(selfa, current, next_wp, subsequent) -> PoseStamped:
 
     return current
 
-def overtake(selfa, current, next_wp) -> PoseStamped:
+def overtake(publisher, current, next_wp) -> PoseStamped:
     """
     Passes near point and redirects
     drone towards next point
@@ -141,14 +141,14 @@ def overtake(selfa, current, next_wp) -> PoseStamped:
     global current_direction
     global path
 
-    print_point(current, selfa)
-    print_point(next_wp, selfa)
+    print_point(current, publisher)
+    print_point(next_wp, publisher)
 
     next_direction = calculate_direction(current, next_wp)
 
     i = 0
-    print_vec(current_direction, selfa)
-    print_vec(next_direction, selfa)
+    print_vec(current_direction, publisher)
+    print_vec(next_direction, publisher)
     while i < 1:
         new_current_direction = slerp(current_direction, next_direction, i)
         i = i + TIME_STEP
@@ -156,7 +156,7 @@ def overtake(selfa, current, next_wp) -> PoseStamped:
         print("SPEED")
         print(str(current_speed))
         print("DIRECTION")
-        print_vec(new_current_direction, selfa)
+        print_vec(new_current_direction, publisher)
 
         next_pose = PoseStamped()
         next_pose.pose.position.x = current.pose.position.x + new_current_direction.x * (current_speed*TIME_STEP)
@@ -164,11 +164,11 @@ def overtake(selfa, current, next_wp) -> PoseStamped:
         next_pose.pose.position.z = current.pose.position.z + new_current_direction.z * (current_speed*TIME_STEP)
 
         print("POSITION")
-        print_point(next_pose, selfa)
+        print_point(next_pose, publisher)
         print("")
         next_pose.header.frame_id = "base_link"
 
-        selfa.publisher_.publish(next_pose)
+        publisher.publisher_.publish(next_pose)
         path.append(next_pose)
         current = next_pose
 
@@ -176,7 +176,7 @@ def overtake(selfa, current, next_wp) -> PoseStamped:
     current_direction = new_current_direction
     return current
 
-def finish(selfa, current, next_wp) -> None:
+def finish(publisher, current, next_wp) -> None:
     """
     Goes towards last waypoint.
     Slows speed until it's zero
@@ -199,7 +199,7 @@ def finish(selfa, current, next_wp) -> None:
         print("SPEED")
         print(str(current_speed))
         print("DIRECTION")
-        print_vec(current_direction, selfa)
+        print_vec(current_direction, publisher)
 
         next_pose = PoseStamped()
         next_pose.pose.position.x = current.pose.position.x + current_direction.x * (current_speed*TIME_STEP)
@@ -207,11 +207,11 @@ def finish(selfa, current, next_wp) -> None:
         next_pose.pose.position.z = current.pose.position.z + current_direction.z * (current_speed*TIME_STEP)
 
         print("POSITION")
-        print_point(next_pose, selfa)
+        print_point(next_pose, publisher)
         print("")
         next_pose.header.frame_id = "base_link"
 
-        selfa.publisher_.publish(next_pose)
+        publisher.publisher_.publish(next_pose)
         path.append(next_pose)
         current = next_pose
 
@@ -374,10 +374,10 @@ def lerp(a: float, b: float, t: float) -> float:
 
 # def find_arc():
 
-def print_vec(v, selfa):
+def print_vec(v, publisher):
     print(f"[{v.x},{v.y},{v.z}]")
 
-def print_point(a,selfa):
+def print_point(a,publisher):
     print(f"({a.pose.position.x},{a.pose.position.y},{a.pose.position.z})")
 
 def main():
