@@ -26,7 +26,7 @@ class WpsPublisher(Node):
         self.publisher_.publish(wps_msg)
 
     def random(self):
-        return generate_random_waypoints(25, 5)
+        return generate_random_waypoints(25, 10)
 
     def prueba1(self):
         poses = []
