@@ -1,0 +1,5 @@
+/drone_1:
+  simulator:
+    ros__parameters:
+      max_speed: 10.0
+      max_acc: 20.0
