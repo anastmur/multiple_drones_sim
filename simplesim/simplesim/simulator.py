@@ -31,9 +31,19 @@ drone_id = 'x'
 
 class Publisher(Node):
     def __init__(self, wps, drone_id):
+
+        global MAX_SPEED
+        global MAX_ACCELERATION
+
         super().__init__('simulator')
 
         self.publisher_ = self.create_publisher(PoseStamped, 'pose', 1)
+
+        MAX_SPEED = self.declare_parameter(
+            'max_speed', 20.0).get_parameter_value().double_value
+
+        MAX_ACCELERATION = self.declare_parameter(
+            'max_acc', 30.0).get_parameter_value().double_value
 
         start(self, wps[0], wps[1:])
 

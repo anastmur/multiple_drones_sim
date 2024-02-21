@@ -34,7 +34,8 @@ def generate_launch_description():
             ])
         ]),
         launch_arguments={
-            'drone_id': 'drone_0'
+            'drone_id': 'drone_0',
+            'drone_config':'drone_0.yaml'
         }.items()
     )
     
@@ -47,7 +48,8 @@ def generate_launch_description():
             ])
         ]),
         launch_arguments={
-            'drone_id': 'drone_1'
+            'drone_id': 'drone_1',
+            'drone_config':'drone_1.yaml'
         }.items()
     )
 
