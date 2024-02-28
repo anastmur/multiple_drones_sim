@@ -15,12 +15,12 @@ import time
 import scipy.interpolate
 
 MAX_SPEED = float(20) # m/s
-MAX_ACCELERATION = float(30) # m/s²
+MAX_ACCELERATION = float(40) # m/s²
 TIME_STEP = 0.1 # s
 NEAR_POINT = float(15) # m. Distance to which a drone is
                # considered near a point.
-IN_POINT = 5
-MIN_ARC_RADIUS = 5 # m
+IN_POINT = 7
+MIN_ARC_RADIUS = 10 # m
 
 current_direction = Vector3()
 current_speed = float(0) #m/s
@@ -43,7 +43,7 @@ class Publisher(Node):
             'max_speed', 20.0).get_parameter_value().double_value
 
         MAX_ACCELERATION = self.declare_parameter(
-            'max_acc', 30.0).get_parameter_value().double_value
+            'max_acc', 40.0).get_parameter_value().double_value
 
         start(self, wps[0], wps[1:])
 
@@ -51,7 +51,7 @@ class PathPublisher(Node):
     def __init__(self):
         super().__init__('path')
 
-        self.publisher_ = self.create_publisher(Path, 'path_', 1)
+        self.publisher_ = self.create_publisher(Path, 'path', 1)
 
 class Subscriber(Node):
     def __init__(self):
@@ -73,7 +73,7 @@ def start(publisher, current_wp: PoseStamped, waypoints: list[PoseStamped]):
     the drone 'fly' through it in RViz
     using Pose messages
     """
-    time.sleep(1)
+    time.sleep(5)
     # Calculate direction of first waypoint
     current_direction = calculate_direction(current_wp, waypoints[0])
 
@@ -111,7 +111,7 @@ def approach(publisher, current, next_wp, subsequent) -> PoseStamped:
             angle = calculate_angle(current, next_wp, subsequent)
             print("ANGLE")
             print(angle)
-            current_speed = calculate_speed(acceleration_with_goal_speed(lerp(previous_speed, calculate_overtake_speed(next_angle), curr_time)))
+            current_speed = calculate_speed(acceleration_with_goal_speed(lerp(previous_speed, calculate_overtake_speed(angle), curr_time)))
         
         print("SPEED")
         print(str(current_speed))

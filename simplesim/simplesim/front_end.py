@@ -8,22 +8,53 @@ class WpsPublisher(Node):
     def __init__(self):
         super().__init__('wps_publisher')
 
+        self.drone_wps = self.declare_parameter(
+            'waypoints', ['nun']).get_parameter_value().string_array_value
+        
+        self.get_logger().info(f'drone_wps: {str(self.drone_wps)}')
+        
         self.drone_id = self.declare_parameter(
-            'drone_id', 'x').get_parameter_value().string_value
+            'drone_id', "drone_x").get_parameter_value().string_value
 
         self.publisher_ = self.create_publisher(Waypoints, 'wps', 1)
-        self.send_msg(drone_id)
+        self.send_msg(self.drone_wps, self.drone_id)
 
-    def send_msg(self, drone_id):
-        wps = self.random()
+    def send_msg(self, drone_wps, drone_id):
+        wps = self.process_waypoints(drone_wps)
+        # if drone_id == 'drone_0':
+        #     wps = self.prueba3()
+        # elif drone_id == 'drone_1':
+        #     wps = self.prueba2()
+        # else:
+        #     wps = self.prueba4()
 
         time.sleep(0.5)
 
         wps_msg = Waypoints()
         wps_msg.wps = wps
-        drone_id = str(wps_msg.drone_id)
 
         self.publisher_.publish(wps_msg)
+
+    def process_waypoints(self, drone_wps):
+        '''
+        Procesa el waypoint dado
+        '''
+        poses = []
+        for waypoint_str in drone_wps:
+            waypoint = waypoint_str.split(";")
+            x = float(waypoint[0])
+            y = float(waypoint[1])
+            z = float(waypoint[2])
+            
+            newPos = PoseStamped()
+            newPos.pose.position.x = x
+            newPos.pose.position.y = y
+            newPos.pose.position.z = z
+            poses.append(newPos)
+
+        return poses
+
+
 
     def random(self):
         return generate_random_waypoints(25, 10)
@@ -40,18 +71,23 @@ class WpsPublisher(Node):
 
         poses[1].pose.position.x = float(20)
         poses[1].pose.position.y = float(80)
+        poses[1].pose.position.z = float(50)
 
         poses[2].pose.position.x = float(40)
         poses[2].pose.position.y = float(0)
+        poses[2].pose.position.z = float(0)
 
         poses[3].pose.position.x = float(70)
         poses[3].pose.position.y = float(20)
+        poses[3].pose.position.z = float(-20)
 
         poses[4].pose.position.x = float(90)
         poses[4].pose.position.y = float(80)
+        poses[4].pose.position.z = float(-40)
 
         poses[5].pose.position.x = float(110)
         poses[5].pose.position.y = float(80)
+        poses[5].pose.position.z = float(-20)
 
         poses[6].pose.position.x = float(110)
         poses[6].pose.position.y = float(0)
@@ -61,12 +97,15 @@ class WpsPublisher(Node):
 
         poses[8].pose.position.x = float(130)
         poses[8].pose.position.y = float(80)
+        poses[8].pose.position.z = float(50)
 
         poses[9].pose.position.x = float(150)
         poses[9].pose.position.y = float(80)
+        poses[9].pose.position.z = float(50)
 
         poses[10].pose.position.x = float(150)
         poses[10].pose.position.y = float(0)
+        poses[10].pose.position.z = float(20)
 
         poses[11].pose.position.x = float(210)
         poses[11].pose.position.y = float(20)
@@ -85,6 +124,139 @@ class WpsPublisher(Node):
 
         poses[16].pose.position.x = float(180)
         poses[16].pose.position.y = float(20)
+
+        return poses
+    
+    def prueba2(self):
+        poses = []
+
+        for i in range(0, 10):
+            newPos = PoseStamped()
+            poses.append(newPos)
+
+        poses[0].pose.position.x = float(0)
+        poses[0].pose.position.y = float(0)
+
+        poses[1].pose.position.x = float(80)
+        poses[1].pose.position.y = float(0)
+        poses[1].pose.position.z = float(-10)
+
+        poses[2].pose.position.x = float(0)
+        poses[2].pose.position.y = float(40)
+        poses[2].pose.position.z = float(0)
+
+        poses[3].pose.position.x = float(80)
+        poses[3].pose.position.y = float(40)
+        poses[3].pose.position.z = float(0)
+
+        poses[4].pose.position.x = float(50)
+        poses[4].pose.position.y = float(80)
+        poses[4].pose.position.z = float(0)
+
+        poses[5].pose.position.x = float(0)
+        poses[5].pose.position.y = float(80)
+        poses[5].pose.position.z = float(0)
+
+        poses[6].pose.position.x = float(0)
+        poses[6].pose.position.y = float(120)
+        poses[6].pose.position.z = float(20)
+
+        poses[7].pose.position.x = float(40)
+        poses[7].pose.position.y = float(160)
+        poses[7].pose.position.z = float(0)
+
+        poses[8].pose.position.x = float(80)
+        poses[8].pose.position.y = float(120)
+        poses[8].pose.position.z = float(10)
+
+        poses[9].pose.position.x = float(40)
+        poses[9].pose.position.y = float(120)
+        poses[9].pose.position.z = float(0)
+
+        return poses
+    
+    def prueba3(self):
+        poses = []
+
+        for i in range(0, 10):
+            newPos = PoseStamped()
+            poses.append(newPos)
+
+        poses[0].pose.position.x = float(110)
+        poses[0].pose.position.y = float(80)
+        poses[0].pose.position.z = float(0)
+
+        poses[1].pose.position.x = float(110)
+        poses[1].pose.position.y = float(0)
+
+        poses[2].pose.position.x = float(130)
+        poses[2].pose.position.y = float(0)
+
+        poses[3].pose.position.x = float(130)
+        poses[3].pose.position.y = float(80)
+        poses[3].pose.position.z = float(20)
+
+        poses[4].pose.position.x = float(150)
+        poses[4].pose.position.y = float(80)
+        poses[4].pose.position.z = float(10)
+
+        poses[5].pose.position.x = float(150)
+        poses[5].pose.position.y = float(0)
+        poses[5].pose.position.z = float(20)
+
+        poses[6].pose.position.x = float(210)
+        poses[6].pose.position.y = float(20)
+    
+        poses[7].pose.position.x = float(220)
+        poses[7].pose.position.y = float(40)
+        poses[7].pose.position.z = float(0)
+
+        poses[8].pose.position.x = float(210)
+        poses[8].pose.position.y = float(60)
+        poses[8].pose.position.z = float(0)
+
+        poses[9].pose.position.x = float(180)
+        poses[9].pose.position.y = float(60)
+        poses[9].pose.position.z = float(10)
+
+        return poses
+    
+    def prueba4(self):
+        poses = []
+
+        for i in range(0, 10):
+            newPos = PoseStamped()
+            poses.append(newPos)
+
+        poses[0].pose.position.x = float(-100)
+        poses[0].pose.position.y = float(50)
+
+        poses[1].pose.position.x = float(-80)
+        poses[1].pose.position.y = float(120)
+
+        poses[2].pose.position.x = float(-80)
+        poses[2].pose.position.y = float(0)
+
+        poses[3].pose.position.x = float(-60)
+        poses[3].pose.position.y = float(0)
+
+        poses[4].pose.position.x = float(-60)
+        poses[4].pose.position.y = float(120)
+
+        poses[5].pose.position.x = float(-40)
+        poses[5].pose.position.y = float(80)
+
+        poses[6].pose.position.x = float(-40)
+        poses[6].pose.position.y = float(60)
+
+        poses[7].pose.position.x = float(-20)
+        poses[7].pose.position.y = float(50)
+
+        poses[8].pose.position.x = float(-20)
+        poses[8].pose.position.y = float(20)
+        
+        poses[9].pose.position.x = float(-100)
+        poses[9].pose.position.y = float(50)
 
         return poses
 

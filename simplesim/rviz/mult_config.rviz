@@ -7,8 +7,11 @@ Visualization Manager:
   Displays:
     - Class: rviz_default_plugins/Grid
       Name: Grid
-      Value: false
-      Plane Cell Count: 200
+      Value: true
+      Plane Cell Count: 60
+      Cell Size: 20
+      Color: 84;84;86
+
     - Alpha: 0.8
       Class: rviz_default_plugins/RobotModel
       Description Topic:
@@ -96,15 +99,15 @@ Visualization Manager:
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 112.30686950683594
-        Y: 44.311405181884766
-        Z: 0.05499178171157837
+        X: 53,825
+        Y: 50,907
+        Z: 8,4884
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Orbit
       Near Clip Distance: 0.009999999776482582
-      Pitch: 1.5697963237762451
+      Pitch: 0,664797
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
       Yaw: 4.6949992179870605

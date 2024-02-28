@@ -35,7 +35,8 @@ def generate_launch_description():
         ]),
         launch_arguments={
             'drone_id': 'drone_0',
-            'drone_config':'drone_0.yaml'
+            'drone_config':'drone_0.yaml',
+            'drone_wps': 'drone_0.yaml'
         }.items()
     )
     
@@ -69,6 +70,6 @@ def generate_launch_description():
     return LaunchDescription([
             rviz_node,
             drone_0,
-            drone_1,
-            drone_2
+            # drone_1,
+            # drone_2
         ])
