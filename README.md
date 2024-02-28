@@ -1,12 +1,13 @@
 # MULTIPLE DRONES SIMULATOR
 
-# Instalación
+## Instalación
 1. Crear una carpeta que sirva como workspace de ROS2
 2. Hacer un clone dentro del workspace
 3. Cambiar el nombre de la carpeta por 'src'
 4. Hacer 'colcon build' desde la carpeta de workspace
 
-##  Configurar el dron
+## Uso
+###  Configurar el dron
 En la carpeta 'src/config' crear un archivo 'drone_X.yaml' donde X sea el número del dron y dentro escribir:
 ```
 \drone_X:
@@ -17,7 +18,7 @@ En la carpeta 'src/config' crear un archivo 'drone_X.yaml' donde X sea el númer
 ```
 Donde A y B sean floats que representen la velocidad máxima y la aceleración máxima respectivamente.
 
-## Crear waypoints para un dron
+### Crear waypoints para un dron
 En la carpeta 'src/waypoints' crear un archivo 'drone_X.yaml' donde X sea el número del dron y dentro escribir:
 ```
 \drone_X:
