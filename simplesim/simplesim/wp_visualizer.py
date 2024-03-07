@@ -1,8 +1,5 @@
-from geometry_msgs.msg import PoseStamped
 from sim_msgs.msg import Waypoints
-from geometry_msgs.msg import Vector3
 from geometry_msgs.msg import Point
-from std_msgs.msg import ColorRGBA
 from visualization_msgs.msg import Marker
 import rclpy
 from rclpy.node import Node
@@ -13,23 +10,16 @@ class WpSubscriber(Node):
     def __init__(self):
         super().__init__('vis_listener')
         
-        # logger.debug('wps_' + drone_id)
-
-        drone_id = self.declare_parameter(
-            'drone_id', 'x').get_parameter_value().string_value
-
         self.subscription = self.create_subscription(Waypoints,'wps',self.visualize,1)
         self.subscription
 
     def visualize(self,msg):
-        pose_publisher = MarkerPublisher(msg.wps, msg.drone_id)
+        pose_publisher = MarkerPublisher(msg.wps)
         rclpy.spin(pose_publisher)
 
 class MarkerPublisher(Node):
-    def __init__(self, wps, drone_id):
+    def __init__(self, wps):
         super().__init__('wp_vis')
-
-        # logger.debug('wps_' + drone_id)
 
         self.publisher_ = self.create_publisher(Marker, 'marker', 100)
 
