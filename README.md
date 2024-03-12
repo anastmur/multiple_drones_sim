@@ -11,7 +11,7 @@
 En la carpeta 'src/config' crear un archivo 'drone_X.yaml' donde X sea el número del dron y dentro escribir:
 ```
 \drone_X:
-  fp:
+  controller:
     ros__parameters:
       max_speed: A
       max_acc: B
