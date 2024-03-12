@@ -27,7 +27,7 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'fp = simplesim.front_end:main',
+            'controller = simplesim.controller:main',
             'simulator = simplesim.simulator:main',
             'wp_vis = simplesim.wp_visualizer:main'
         ],

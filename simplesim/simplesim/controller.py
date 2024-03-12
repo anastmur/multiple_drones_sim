@@ -12,14 +12,11 @@ class WpsPublisher(Node):
             'waypoints', ['nun']).get_parameter_value().string_array_value
         
         self.get_logger().info(f'drone_wps: {str(self.drone_wps)}')
-        
-        self.drone_id = self.declare_parameter(
-            'drone_id', "drone_x").get_parameter_value().string_value
 
         self.publisher_ = self.create_publisher(Waypoints, 'wps', 1)
-        self.send_msg(self.drone_wps, self.drone_id)
+        self.send_msg(self.drone_wps)
 
-    def send_msg(self, drone_wps, drone_id):
+    def send_msg(self, drone_wps):
         wps = self.process_waypoints(drone_wps)
         # if drone_id == 'drone_0':
         #     wps = self.prueba3()

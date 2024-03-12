@@ -44,8 +44,8 @@ def get_wps_with_context(context: LaunchContext, drone_id):
     return [launch_ros.actions.Node(
         namespace=drone_id,
         package='simplesim',
-        executable='fp',
-        name='fp',
+        executable='controller',
+        name='controller',
         parameters=[wps]
     )]
 
@@ -76,14 +76,6 @@ def generate_launch_description():
         package='simplesim',
         executable='wp_vis',
         name='wps'
-    )
-
-    fp = launch_ros.actions.Node(
-        namespace=drone_id,
-        package='simplesim',
-        executable='fp',
-        name='fp',
-        parameters=[{'drone_id':drone_id}]
     )
 
     return launch.LaunchDescription([
