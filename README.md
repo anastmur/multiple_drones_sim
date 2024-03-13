@@ -8,7 +8,7 @@
 
 ## Uso
 ###  Configurar el dron
-En la carpeta 'src/config' crear un archivo 'drone_X.yaml' donde X sea el número del dron y dentro escribir:
+En la carpeta 'src/simplesim/config' crear un archivo 'drone_X.yaml' donde X sea el número del dron y dentro escribir:
 ```
 \drone_X:
   controller:
@@ -19,7 +19,7 @@ En la carpeta 'src/config' crear un archivo 'drone_X.yaml' donde X sea el númer
 Donde A y B sean floats que representen la velocidad máxima y la aceleración máxima respectivamente.
 
 ### Crear waypoints para un dron
-En la carpeta 'src/waypoints' crear un archivo 'drone_X.yaml' donde X sea el número del dron y dentro escribir:
+En la carpeta 'src/simplesim/waypoints' crear un archivo 'drone_X.yaml' donde X sea el número del dron y dentro escribir:
 ```
 \drone_X:
   simulator:
