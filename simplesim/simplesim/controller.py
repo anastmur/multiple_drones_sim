@@ -37,8 +37,13 @@ class WpsPublisher(Node):
         Procesa el waypoint dado
         '''
         poses = []
-        for waypoint_str in drone_wps:
-            waypoint = waypoint_str.split(";")
+        for waypoint_array in drone_wps:
+            if isinstance(waypoint_array, str):
+                waypoint = waypoint_array.split(";")
+                self.get_logger().info('Waypoints in String format')
+            else:
+                waypoint = waypoint_array
+                self.get_logger().info('Waypoints in array format')
             x = float(waypoint[0])
             y = float(waypoint[1])
             z = float(waypoint[2])
