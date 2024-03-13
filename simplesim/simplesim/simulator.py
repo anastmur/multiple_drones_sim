@@ -26,6 +26,7 @@ class Publisher(Node):
 
         global MAX_SPEED
         global MAX_ACCELERATION
+        global DRONE_ID
 
         super().__init__('simulator')
 
@@ -36,6 +37,9 @@ class Publisher(Node):
 
         MAX_ACCELERATION = self.declare_parameter(
             'max_acc', 40.0).get_parameter_value().double_value
+        
+        DRONE_ID = self.declare_parameter(
+            'drone_id', 'drone_x').get_parameter_value().string_value
 
         start(self, wps[0], wps[1:])
 
