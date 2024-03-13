@@ -12,6 +12,7 @@ import time
 MAX_SPEED = float(20) # m/s
 MAX_ACCELERATION = float(40) # m/s²
 TIME_STEP = 0.1 # s
+TIME_SPENT = 0.0
 NEAR_POINT = float(15) # m. Distance to which a drone is
                # considered near a point.
 IN_POINT = 7
@@ -79,6 +80,7 @@ def start(publisher, current_wp: PoseStamped, waypoints: list[PoseStamped]):
         current_wp = approach(publisher, current_wp, next_wp, subsequent)
         current_wp = overtake(publisher, current_wp, subsequent)
     finish(publisher, current_wp, waypoints[-1]) # Last point
+    publisher.get_logger().info(f'TOTAL TIME: {TIME_SPENT:.3f}')
 
 def approach(publisher, current, next_wp, subsequent) -> PoseStamped:
     """
@@ -90,6 +92,7 @@ def approach(publisher, current, next_wp, subsequent) -> PoseStamped:
     global current_speed
     global current_direction
     global path
+    global TIME_SPENT
 
     current_direction = calculate_direction(current, next_wp)
     curr_time = 0
@@ -130,6 +133,7 @@ def approach(publisher, current, next_wp, subsequent) -> PoseStamped:
         # path_publisher.publisher_.publish(new_path)
         current = next_pose
 
+        TIME_SPENT += TIME_STEP
         time.sleep(TIME_STEP)
 
     return current
@@ -144,6 +148,7 @@ def overtake(publisher, current, next_wp) -> PoseStamped:
     global current_speed
     global current_direction
     global path
+    global TIME_SPENT
 
     print_point(current)
     print_point(next_wp)
@@ -176,6 +181,7 @@ def overtake(publisher, current, next_wp) -> PoseStamped:
         path.append(next_pose)
         current = next_pose
 
+        TIME_SPENT += TIME_STEP
         time.sleep(TIME_STEP)
     current_direction = new_current_direction
     return current
@@ -191,6 +197,7 @@ def finish(publisher, current, next_wp) -> None:
     global current_speed
     global current_direction
     global path
+    global TIME_SPENT
 
     current_direction = calculate_direction(current, next_wp)
 
@@ -219,6 +226,7 @@ def finish(publisher, current, next_wp) -> None:
         path.append(next_pose)
         current = next_pose
 
+        TIME_SPENT += TIME_STEP
         time.sleep(TIME_STEP)
 
 def distance(a: PoseStamped, b: PoseStamped) -> float:
