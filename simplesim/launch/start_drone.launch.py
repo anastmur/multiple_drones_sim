@@ -46,7 +46,7 @@ def get_wps_with_context(context: LaunchContext, drone_id):
         package='simplesim',
         executable='controller',
         name='controller',
-        parameters=[wps]
+        parameters=[{'waypoints' : ['0.0;0.0;0.0', '20.0;80.0;0.0', '40.0;0.0;0.0', '70.0;20.0;0.0', '90.0;80.0;0.0', '110.0;80.0;0.0']}]
     )]
 
 def generate_launch_description():
