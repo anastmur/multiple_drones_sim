@@ -97,21 +97,24 @@ def approach(publisher, current, next_wp, subsequent) -> PoseStamped:
     current_direction = calculate_direction(current, next_wp)
     curr_time = 0
     previous_speed = current_speed
+    near_point = calculate_near_point(calculate_overtake_speed(calculate_angle(current, next_wp, subsequent)), MAX_SPEED)
+    publisher.get_logger().info(f'NEAR POINT CALCULATED: {near_point + IN_POINT}')
+    publisher.get_logger().info(f'Vf: {calculate_overtake_speed(calculate_angle(current, next_wp, subsequent))} Vi: {MAX_SPEED}')
     while distance(current, next_wp) > IN_POINT:
-        if distance(current, next_wp) > NEAR_POINT:
-            print("NOT_NEAR")
+        if distance(current, next_wp) > near_point+IN_POINT:
+            # publisher.get_logger().info("NOT_NEAR")
             current_speed = calculate_speed(MAX_ACCELERATION)
         else:
             if curr_time < 1:
                 curr_time += TIME_STEP
-            print("NEAR_POINT")
+            # publisher.get_logger().info("NEAR_POINT")
             angle = calculate_angle(current, next_wp, subsequent)
-            print("ANGLE")
-            print(angle)
+            # publisher.get_logger().info("ANGLE")
+            # publisher.get_logger().info(f'{angle}')
             current_speed = calculate_speed(acceleration_with_goal_speed(lerp(previous_speed, calculate_overtake_speed(angle), curr_time)))
         
-        print("SPEED")
-        print(str(current_speed))
+        # publisher.get_logger().info("SPEED")
+        # publisher.get_logger().info(str(current_speed))
         print("DIRECTION")
         print_vec(current_direction)
 
@@ -240,7 +243,7 @@ def calculate_overtake_speed(angle: float) -> float:
     Calculates the speed needed
     to pass through an angle
     """
-    return (angle)/(math.pi*2) * MAX_SPEED
+    return (angle)/(math.pi) * MAX_SPEED
 
 def acceleration_with_goal_speed(goal: float) -> float:
     """
@@ -383,6 +386,9 @@ def lerp(a: float, b: float, t: float) -> float:
     Lerp function
     """
     return (1 - t) * a + t * b
+
+def calculate_near_point(vf, vi) -> float:
+    return abs(vf**2 - vi**2)/(2*(MAX_ACCELERATION*0.85))
 
 def print_vec(v):
     print(f"[{v.x},{v.y},{v.z}]")
