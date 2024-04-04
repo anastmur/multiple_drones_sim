@@ -11,11 +11,15 @@ import time
 
 MAX_SPEED = float(20) # m/s
 MAX_ACCELERATION = float(40) # m/s²
+
 TIME_STEP = 0.1 # s
 TIME_SPENT = 0.0
+TIME_BETWEEN_WPS = 0.0
+times = []
+
 NEAR_POINT = float(15) # m. Distance to which a drone is
                # considered near a point.
-IN_POINT = 7
+IN_POINT = 0.1
 MIN_ARC_RADIUS = 10 # m
 
 current_direction = Vector3()
@@ -73,14 +77,21 @@ def start(publisher, current_wp: PoseStamped, waypoints: list[PoseStamped]):
     # Calculate direction of first waypoint
     current_direction = calculate_direction(current_wp, waypoints[0])
 
-    print_vec(current_direction)
+    print_vec(current_direction, publisher)
 
     for next_wp in waypoints[:-1]:
+        publisher.get_logger().info('*** CURRENT NEXT POINTS:')
+        print_point(next_wp, publisher)
+        # if distance(current_wp, next_wp) < 0.2:
+        #     time.sleep(0.5)
+        #     publisher.get_logger().info('*** JUMP')
+        #     continue # HUH ????
         subsequent = waypoints[waypoints.index(next_wp)+1]
         current_wp = approach(publisher, current_wp, next_wp, subsequent)
         current_wp = overtake(publisher, current_wp, subsequent)
     finish(publisher, current_wp, waypoints[-1]) # Last point
     publisher.get_logger().info(f'TOTAL TIME: {TIME_SPENT:.3f}')
+    publisher.get_logger().info(f'TIMES: {times}')
 
 def approach(publisher, current, next_wp, subsequent) -> PoseStamped:
     """
@@ -95,6 +106,9 @@ def approach(publisher, current, next_wp, subsequent) -> PoseStamped:
     global TIME_SPENT
 
     current_direction = calculate_direction(current, next_wp)
+    print_point(current, publisher)
+    print_point(next_wp, publisher)
+    print_point(subsequent, publisher)
     curr_time = 0
     previous_speed = current_speed
     near_point = calculate_near_point(calculate_overtake_speed(calculate_angle(current, next_wp, subsequent)), MAX_SPEED)
@@ -116,7 +130,7 @@ def approach(publisher, current, next_wp, subsequent) -> PoseStamped:
         # publisher.get_logger().info("SPEED")
         # publisher.get_logger().info(str(current_speed))
         print("DIRECTION")
-        print_vec(current_direction)
+        print_vec(current_direction, publisher)
 
         next_pose = PoseStamped()
         next_pose.pose.position.x = current.pose.position.x + current_direction.x * (current_speed*TIME_STEP)
@@ -124,7 +138,7 @@ def approach(publisher, current, next_wp, subsequent) -> PoseStamped:
         next_pose.pose.position.z = current.pose.position.z + current_direction.z * (current_speed*TIME_STEP)
 
         print("POSITION")
-        print_point(next_pose)
+        print_point(next_pose, publisher)
         print("")
         next_pose.header.frame_id = "base_link"
 
@@ -152,15 +166,16 @@ def overtake(publisher, current, next_wp) -> PoseStamped:
     global current_direction
     global path
     global TIME_SPENT
+    global TIME_BETWEEN_WPS
 
-    print_point(current)
-    print_point(next_wp)
+    print_point(current, publisher)
+    print_point(next_wp, publisher)
 
     next_direction = calculate_direction(current, next_wp)
 
     i = 0
-    print_vec(current_direction)
-    print_vec(next_direction)
+    print_vec(current_direction, publisher)
+    print_vec(next_direction, publisher)
     while i < 1:
         new_current_direction = slerp(current_direction, next_direction, i)
         i = i + TIME_STEP
@@ -168,7 +183,7 @@ def overtake(publisher, current, next_wp) -> PoseStamped:
         print("SPEED")
         print(str(current_speed))
         print("DIRECTION")
-        print_vec(new_current_direction)
+        print_vec(new_current_direction, publisher)
 
         next_pose = PoseStamped()
         next_pose.pose.position.x = current.pose.position.x + new_current_direction.x * (current_speed*TIME_STEP)
@@ -176,7 +191,7 @@ def overtake(publisher, current, next_wp) -> PoseStamped:
         next_pose.pose.position.z = current.pose.position.z + new_current_direction.z * (current_speed*TIME_STEP)
 
         print("POSITION")
-        print_point(next_pose)
+        print_point(next_pose, publisher)
         print("")
         next_pose.header.frame_id = "base_link"
 
@@ -186,6 +201,10 @@ def overtake(publisher, current, next_wp) -> PoseStamped:
 
         TIME_SPENT += TIME_STEP
         time.sleep(TIME_STEP)
+
+    publisher.get_logger().info(f'CURRENT TIME: {TIME_SPENT - TIME_BETWEEN_WPS}')
+    times.append(TIME_SPENT - TIME_BETWEEN_WPS)
+    TIME_BETWEEN_WPS = TIME_SPENT
     current_direction = new_current_direction
     return current
 
@@ -201,6 +220,7 @@ def finish(publisher, current, next_wp) -> None:
     global current_direction
     global path
     global TIME_SPENT
+    global TIME_BETWEEN_WPS
 
     current_direction = calculate_direction(current, next_wp)
 
@@ -213,7 +233,7 @@ def finish(publisher, current, next_wp) -> None:
         print("SPEED")
         print(str(current_speed))
         print("DIRECTION")
-        print_vec(current_direction)
+        print_vec(current_direction, publisher)
 
         next_pose = PoseStamped()
         next_pose.pose.position.x = current.pose.position.x + current_direction.x * (current_speed*TIME_STEP)
@@ -221,7 +241,7 @@ def finish(publisher, current, next_wp) -> None:
         next_pose.pose.position.z = current.pose.position.z + current_direction.z * (current_speed*TIME_STEP)
 
         print("POSITION")
-        print_point(next_pose)
+        print_point(next_pose, publisher)
         print("")
         next_pose.header.frame_id = "base_link"
 
@@ -231,6 +251,9 @@ def finish(publisher, current, next_wp) -> None:
 
         TIME_SPENT += TIME_STEP
         time.sleep(TIME_STEP)
+    publisher.get_logger().info(f'CURRENT TIME: {TIME_SPENT - TIME_BETWEEN_WPS}')
+    times.append(TIME_SPENT - TIME_BETWEEN_WPS)
+    TIME_BETWEEN_WPS = TIME_SPENT
 
 def distance(a: PoseStamped, b: PoseStamped) -> float:
     """
@@ -294,7 +317,7 @@ def calculate_angle(point_x, point_y, point_z) -> float:
 
     x = dot_product/(mag_a*mag_b)
     if x > 1: # evita errores de dominio por la coma flotante
-        x = 1
+        x = 0.9
     if x < -1:
         x = -1
     return (math.acos(x))
@@ -325,7 +348,7 @@ def calculate_angle_vectors(point_x, point_y, point_z) -> float:
 
     x = dot_product/(mag_a*mag_b)
     if x > 1: # evita errores de dominio por la coma flotante
-        x = 1
+        x = 0.9
     if x < -1:
         x = -1
     return (math.acos(x))
@@ -390,11 +413,11 @@ def lerp(a: float, b: float, t: float) -> float:
 def calculate_near_point(vf, vi) -> float:
     return abs(vf**2 - vi**2)/(2*(MAX_ACCELERATION*0.85))
 
-def print_vec(v):
-    print(f"[{v.x},{v.y},{v.z}]")
+def print_vec(v, publisher):
+    publisher.get_logger().info(f"[{v.x},{v.y},{v.z}]")
 
-def print_point(a):
-    print(f"({a.pose.position.x},{a.pose.position.y},{a.pose.position.z})")
+def print_point(a, publisher):
+    publisher.get_logger().info(f"({a.pose.position.x},{a.pose.position.y},{a.pose.position.z})")
 
 def main():
     # global path_publisher
