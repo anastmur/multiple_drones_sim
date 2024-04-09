@@ -19,7 +19,7 @@ times = []
 
 NEAR_POINT = float(15) # m. Distance to which a drone is
                # considered near a point.
-IN_POINT = 0.1
+IN_POINT = 3
 MIN_ARC_RADIUS = 10 # m
 
 current_direction = Vector3()
@@ -100,8 +100,9 @@ class Publisher(Node):
         near_point = calculate_near_point(calculate_overtake_speed(calculate_angle(current, next_wp, subsequent)), MAX_SPEED)
         self.get_logger().info(f'NEAR POINT CALCULATED: {near_point + IN_POINT}')
         self.get_logger().info(f'Vf: {calculate_overtake_speed(calculate_angle(current, next_wp, subsequent))} Vi: {MAX_SPEED}')
-        while distance(current, next_wp) > IN_POINT:
-            if distance(current, next_wp) > near_point+IN_POINT:
+        in_point = near_point * 0.4
+        while distance(current, next_wp) > in_point:
+            if distance(current, next_wp) > near_point+in_point:
                 # publisher.get_logger().info("NOT_NEAR")
                 current_speed = calculate_speed(MAX_ACCELERATION)
             else:
@@ -115,17 +116,17 @@ class Publisher(Node):
             
             # publisher.get_logger().info("SPEED")
             # publisher.get_logger().info(str(current_speed))
-            print("DIRECTION")
-            self.print_vec(current_direction)
+            # print("DIRECTION")
+            # self.print_vec(current_direction)
 
             next_pose = PoseStamped()
             next_pose.pose.position.x = current.pose.position.x + current_direction.x * (current_speed*TIME_STEP)
             next_pose.pose.position.y = current.pose.position.y + current_direction.y * (current_speed*TIME_STEP)
             next_pose.pose.position.z = current.pose.position.z + current_direction.z * (current_speed*TIME_STEP)
 
-            print("POSITION")
-            self.print_point(next_pose)
-            print("")
+            # print("POSITION")
+            # self.print_point(next_pose)
+            # print("")
             next_pose.header.frame_id = "base_link"
 
             self.publisher_.publish(next_pose)
@@ -139,6 +140,7 @@ class Publisher(Node):
             TIME_SPENT += TIME_STEP
             time.sleep(TIME_STEP)
 
+        self.get_logger().info("****** OUT OF APPROACH")
         return current
     
     def overtake(self, current, next_wp) -> PoseStamped:
@@ -166,19 +168,19 @@ class Publisher(Node):
             new_current_direction = slerp(current_direction, next_direction, i)
             i = i + TIME_STEP
 
-            print("SPEED")
-            print(str(current_speed))
-            print("DIRECTION")
-            self.print_vec(new_current_direction)
+            # print("SPEED")
+            # print(str(current_speed))
+            # print("DIRECTION")
+            # self.print_vec(new_current_direction)
 
             next_pose = PoseStamped()
             next_pose.pose.position.x = current.pose.position.x + new_current_direction.x * (current_speed*TIME_STEP)
             next_pose.pose.position.y = current.pose.position.y + new_current_direction.y * (current_speed*TIME_STEP)
             next_pose.pose.position.z = current.pose.position.z + new_current_direction.z * (current_speed*TIME_STEP)
 
-            print("POSITION")
-            self.print_point(next_pose)
-            print("")
+            # print("POSITION")
+            # self.print_point(next_pose)
+            # print("")
             next_pose.header.frame_id = "base_link"
 
             self.publisher_.publish(next_pose)
