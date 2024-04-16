@@ -57,6 +57,8 @@ def main():
     rclpy.init()
     wps_publisher = WpsPublisher()
     rclpy.spin(wps_publisher)
+    wps_publisher.destroy_node()
+    rclpy.shutdown()
 
 if __name__ == '__main__':
     main()

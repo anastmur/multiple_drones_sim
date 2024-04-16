@@ -1,6 +1,7 @@
 from .random_waypoints_generator import *
 
 from sim_msgs.msg import Waypoints
+from sim_msgs.msg import DroneResults
 from geometry_msgs.msg import PoseStamped
 from geometry_msgs.msg import Vector3
 from nav_msgs.msg import Path
@@ -17,9 +18,11 @@ TIME_SPENT = 0.0
 TIME_BETWEEN_WPS = 0.0
 times = []
 
+TOTAL_DISTANCE = 0.0
+
 NEAR_POINT = float(15) # m. Distance to which a drone is
                # considered near a point.
-IN_POINT = 3
+IN_POINT = 7
 MIN_ARC_RADIUS = 10 # m
 
 current_direction = Vector3()
@@ -76,8 +79,14 @@ class Publisher(Node):
                 current_wp = self.overtake(current_wp, subsequent)
         self.finish(current_wp, waypoints[-1]) # Last point
 
+        results_publisher = ResultsPublisher()
+        results_publisher.publish_results(TIME_SPENT, TOTAL_DISTANCE)
+        # results_publisher.destroy_node()
+        
+
         self.get_logger().info(f'TOTAL TIME: {TIME_SPENT:.3f}')
         self.get_logger().info(f'TIMES: {times}')
+        self.get_logger().info(f'TOTAL DISTANCE: {TOTAL_DISTANCE:.3f}')
 
     def approach(self, current, next_wp, subsequent) -> PoseStamped:
         """
@@ -90,6 +99,7 @@ class Publisher(Node):
         global current_direction
         global path
         global TIME_SPENT
+        global TOTAL_DISTANCE
 
         current_direction = calculate_direction(current, next_wp)
         self.print_point(current)
@@ -124,6 +134,14 @@ class Publisher(Node):
             next_pose.pose.position.y = current.pose.position.y + current_direction.y * (current_speed*TIME_STEP)
             next_pose.pose.position.z = current.pose.position.z + current_direction.z * (current_speed*TIME_STEP)
 
+            position_difference_vector_X = next_pose.pose.position.x - current.pose.position.x
+            position_difference_vector_Y = next_pose.pose.position.y - current.pose.position.y
+            position_difference_vector_Z = next_pose.pose.position.z - current.pose.position.z
+
+            magnitude = math.sqrt(position_difference_vector_X ** 2 + position_difference_vector_Y ** 2 + position_difference_vector_Z ** 2)
+
+            TOTAL_DISTANCE += magnitude
+
             # print("POSITION")
             # self.print_point(next_pose)
             # print("")
@@ -155,6 +173,7 @@ class Publisher(Node):
         global path
         global TIME_SPENT
         global TIME_BETWEEN_WPS
+        global TOTAL_DISTANCE
 
         self.print_point(current)
         self.print_point(next_wp)
@@ -177,6 +196,14 @@ class Publisher(Node):
             next_pose.pose.position.x = current.pose.position.x + new_current_direction.x * (current_speed*TIME_STEP)
             next_pose.pose.position.y = current.pose.position.y + new_current_direction.y * (current_speed*TIME_STEP)
             next_pose.pose.position.z = current.pose.position.z + new_current_direction.z * (current_speed*TIME_STEP)
+
+            position_difference_vector_X = next_pose.pose.position.x - current.pose.position.x
+            position_difference_vector_Y = next_pose.pose.position.y - current.pose.position.y
+            position_difference_vector_Z = next_pose.pose.position.z - current.pose.position.z
+
+            magnitude = math.sqrt(position_difference_vector_X ** 2 + position_difference_vector_Y ** 2 + position_difference_vector_Z ** 2)
+
+            TOTAL_DISTANCE += magnitude
 
             # print("POSITION")
             # self.print_point(next_pose)
@@ -209,6 +236,7 @@ class Publisher(Node):
         global path
         global TIME_SPENT
         global TIME_BETWEEN_WPS
+        global TOTAL_DISTANCE
 
         current_direction = calculate_direction(current, next_wp)
 
@@ -227,6 +255,14 @@ class Publisher(Node):
             next_pose.pose.position.x = current.pose.position.x + current_direction.x * (current_speed*TIME_STEP)
             next_pose.pose.position.y = current.pose.position.y + current_direction.y * (current_speed*TIME_STEP)
             next_pose.pose.position.z = current.pose.position.z + current_direction.z * (current_speed*TIME_STEP)
+
+            position_difference_vector_X = next_pose.pose.position.x - current.pose.position.x
+            position_difference_vector_Y = next_pose.pose.position.y - current.pose.position.y
+            position_difference_vector_Z = next_pose.pose.position.z - current.pose.position.z
+
+            magnitude = math.sqrt(position_difference_vector_X ** 2 + position_difference_vector_Y ** 2 + position_difference_vector_Z ** 2)
+
+            TOTAL_DISTANCE += magnitude
 
             print("POSITION")
             self.print_point(next_pose)
@@ -265,8 +301,21 @@ class Subscriber(Node):
     def startup(self,msg):
         wps = msg.wps
         pose_publisher = Publisher(wps)
-        rclpy.spin(pose_publisher)
+        # rclpy.spin(pose_publisher)
 
+class ResultsPublisher(Node):
+    def __init__(self):
+        super().__init__('results_publisher')
+
+        self.publisher_ = self.create_publisher(DroneResults,'drone_results', 1)
+
+    def publish_results(self, t_time, t_distance):
+        dr = DroneResults()
+        dr.total_time = t_time
+        dr.total_distance = t_distance
+        self.get_logger().info('RESULTS SENT')
+
+        self.publisher_.publish(dr)
 
 def distance(a: PoseStamped, b: PoseStamped) -> float:
     """
@@ -432,4 +481,6 @@ def main():
     rclpy.init()
     pose_subscriber = Subscriber()
     rclpy.spin(pose_subscriber)
+    pose_subscriber.destroy_node()
+    rclpy.shutdown()
     # rclpy.spin(path_publisher)

@@ -15,7 +15,7 @@ class WpSubscriber(Node):
 
     def visualize(self,msg):
         pose_publisher = MarkerPublisher(msg.wps)
-        rclpy.spin(pose_publisher)
+        # rclpy.spin(pose_publisher)
 
 class MarkerPublisher(Node):
     def __init__(self, wps):
@@ -36,9 +36,9 @@ class MarkerPublisher(Node):
             m.header.frame_id = "base_link"
             m.type = Marker.SPHERE
             m.action = Marker.ADD
-            m.scale.x = 1.5
-            m.scale.y = 1.5
-            m.scale.z = 1.5
+            m.scale.x = 1.0
+            m.scale.y = 1.0
+            m.scale.z = 1.0
             m.color.a = 1.0
             m.color.r = 1.0
             m.id = i
@@ -87,3 +87,6 @@ def main():
     rclpy.init()
     pose_subscriber = WpSubscriber()
     rclpy.spin(pose_subscriber)
+    pose_subscriber.get_logger().info('DESTROYING MARKER PUBLISHER')
+    pose_subscriber.destroy_node()
+    rclpy.shutdown()
