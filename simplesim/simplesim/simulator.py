@@ -108,10 +108,10 @@ class Publisher(Node):
         self.print_point(subsequent)
         curr_time = 0
         previous_speed = current_speed
-        near_point = calculate_near_point(calculate_overtake_speed(calculate_angle(current, next_wp, subsequent)), MAX_SPEED)
-        self.get_logger().info(f'NEAR POINT CALCULATED: {near_point + IN_POINT}')
+        near_point = calculate_near_point(calculate_overtake_speed(calculate_angle(current, next_wp, subsequent)), MAX_SPEED) * 1.35
         self.get_logger().info(f'Vf: {calculate_overtake_speed(calculate_angle(current, next_wp, subsequent))} Vi: {MAX_SPEED}')
-        in_point = near_point * 0.4
+        in_point = distance(current, next_wp) * 0.10
+        self.get_logger().info(f'NEAR POINT CALCULATED: {near_point + in_point}')
         while distance(current, next_wp) > in_point:
             if distance(current, next_wp) > near_point+in_point:
                 # publisher.get_logger().info("NOT_NEAR")
@@ -124,7 +124,7 @@ class Publisher(Node):
                 # publisher.get_logger().info("ANGLE")
                 # publisher.get_logger().info(f'{angle}')
                 current_speed = calculate_speed(acceleration_with_goal_speed(lerp(previous_speed, calculate_overtake_speed(angle), curr_time)))
-            
+
             # publisher.get_logger().info("SPEED")
             # publisher.get_logger().info(str(current_speed))
             # print("DIRECTION")
@@ -445,7 +445,7 @@ def slerp(a, b, t) -> Vector3:
 
     omega = calculate_angle_vectors(a, origin, b) # calculates angle between the two directions
 
-    if omega > 2.9:
+    if omega > 3:
         return 1
 
     r1 = math.sin(((1-t)*omega))/math.sin(omega)
