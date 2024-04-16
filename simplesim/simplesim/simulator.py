@@ -445,6 +445,9 @@ def slerp(a, b, t) -> Vector3:
 
     omega = calculate_angle_vectors(a, origin, b) # calculates angle between the two directions
 
+    if omega > 2.9:
+        return 1
+
     r1 = math.sin(((1-t)*omega))/math.sin(omega)
     r2 = math.sin(t/omega)/math.sin(omega)
 
