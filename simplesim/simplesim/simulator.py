@@ -29,6 +29,8 @@ current_direction = Vector3()
 current_speed = float(0) #m/s
 path = []
 
+DRONE_ID = 'drone_x'
+
 class Publisher(Node):
     def __init__(self, wps):
 
@@ -46,8 +48,7 @@ class Publisher(Node):
         MAX_ACCELERATION = self.declare_parameter(
             'max_acc', 40.0).get_parameter_value().double_value
         
-        DRONE_ID = self.declare_parameter(
-            'drone_id', 'drone_x').get_parameter_value().string_value
+        DRONE_ID = self.get_namespace()[1:]
 
         self.start(wps[0], wps[1:])
 
@@ -79,8 +80,8 @@ class Publisher(Node):
                 current_wp = self.overtake(current_wp, subsequent)
         self.finish(current_wp, waypoints[-1]) # Last point
 
-        results_publisher = ResultsPublisher()
-        results_publisher.publish_results(TIME_SPENT, TOTAL_DISTANCE)
+        results_publisher = ResultsPublisher(TIME_SPENT, TOTAL_DISTANCE)
+        # rclpy.spin_once(results_publisher)
         # results_publisher.destroy_node()
         
 
@@ -304,16 +305,18 @@ class Subscriber(Node):
         # rclpy.spin(pose_publisher)
 
 class ResultsPublisher(Node):
-    def __init__(self):
+    def __init__(self, t_time, t_distance):
         super().__init__('results_publisher')
 
-        self.publisher_ = self.create_publisher(DroneResults,'drone_results', 1)
+        self.publisher_ = self.create_publisher(DroneResults,'/drone_results', 1)
 
-    def publish_results(self, t_time, t_distance):
+        global DRONE_ID
+        
         dr = DroneResults()
+        dr.drone_id = DRONE_ID
         dr.total_time = t_time
         dr.total_distance = t_distance
-        self.get_logger().info('RESULTS SENT')
+        self.get_logger().info('RESULTS SENT {DRONE_ID}')
 
         self.publisher_.publish(dr)
 
