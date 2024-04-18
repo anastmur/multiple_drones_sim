@@ -76,8 +76,7 @@ class Publisher(Node):
             self.print_point(subsequent)
             angle = calculate_angle(saved_current_wp, next_wp, subsequent)
             self.get_logger().info(f'ANGLE: {angle}')
-            if angle < 3:
-                current_wp = self.overtake(current_wp, subsequent)
+            current_wp = self.overtake(current_wp, subsequent)
         self.finish(current_wp, waypoints[-1]) # Last point
 
         results_publisher = ResultsPublisher(TIME_SPENT, TOTAL_DISTANCE)
@@ -108,9 +107,9 @@ class Publisher(Node):
         self.print_point(subsequent)
         curr_time = 0
         previous_speed = current_speed
-        near_point = calculate_near_point(calculate_overtake_speed(calculate_angle(current, next_wp, subsequent)), MAX_SPEED) * 1.35
+        near_point = calculate_near_point(calculate_overtake_speed(calculate_angle(current, next_wp, subsequent)), MAX_SPEED) * 2.0
         self.get_logger().info(f'Vf: {calculate_overtake_speed(calculate_angle(current, next_wp, subsequent))} Vi: {MAX_SPEED}')
-        in_point = distance(current, next_wp) * 0.10
+        in_point = distance(current, next_wp) * 0.1
         self.get_logger().info(f'NEAR POINT CALCULATED: {near_point + in_point}')
         while distance(current, next_wp) > in_point:
             if distance(current, next_wp) > near_point+in_point:
@@ -316,7 +315,7 @@ class ResultsPublisher(Node):
         dr.drone_id = DRONE_ID
         dr.total_time = t_time
         dr.total_distance = t_distance
-        self.get_logger().info('RESULTS SENT {DRONE_ID}')
+        self.get_logger().info(f'RESULTS SENT {DRONE_ID}')
 
         self.publisher_.publish(dr)
 
@@ -331,7 +330,8 @@ def calculate_overtake_speed(angle: float) -> float:
     Calculates the speed needed
     to pass through an angle
     """
-    return (angle)/(math.pi) * MAX_SPEED
+    speed = (angle)/(math.pi) * MAX_SPEED
+    return speed if speed > 0.1 else 0.1
 
 def acceleration_with_goal_speed(goal: float) -> float:
     """
@@ -445,11 +445,8 @@ def slerp(a, b, t) -> Vector3:
 
     omega = calculate_angle_vectors(a, origin, b) # calculates angle between the two directions
 
-    if omega > 3:
-        return 1
-
-    r1 = math.sin(((1-t)*omega))/math.sin(omega)
-    r2 = math.sin(t/omega)/math.sin(omega)
+    r1 = abs(math.sin(((1-t)*omega))/math.sin(omega))
+    r2 = abs(math.sin(t/omega)/math.sin(omega))
 
     a_x_r = r1 * a.x
     a_y_r = r1 * a.y
@@ -479,7 +476,7 @@ def lerp(a: float, b: float, t: float) -> float:
     return (1 - t) * a + t * b
 
 def calculate_near_point(vf, vi) -> float:
-    return abs(vf**2 - vi**2)/(2*(MAX_ACCELERATION*0.85))
+    return abs(vf**2 - vi**2)/(2*(MAX_ACCELERATION))
 
 def main():
     # global path_publisher
