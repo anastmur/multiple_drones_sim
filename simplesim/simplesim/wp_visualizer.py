@@ -10,18 +10,18 @@ class WpSubscriber(Node):
     def __init__(self):
         super().__init__('vis_listener')
         
-        self.subscription = self.create_subscription(Waypoints,'wps',self.visualize,1)
+        self.subscription = self.create_subscription(Waypoints,'wps',self.visualize,10)
         self.subscription
 
     def visualize(self,msg):
         pose_publisher = MarkerPublisher(msg.wps)
-        # rclpy.spin(pose_publisher)
+        self.destroy_subscription(self.subscription)
 
 class MarkerPublisher(Node):
     def __init__(self, wps):
         super().__init__('wp_vis')
 
-        self.publisher_ = self.create_publisher(Marker, 'marker', 100)
+        self.publisher_ = self.create_publisher(Marker, 'marker', 10)
 
         i = 0
         before = None
@@ -36,9 +36,9 @@ class MarkerPublisher(Node):
             m.header.frame_id = "base_link"
             m.type = Marker.SPHERE
             m.action = Marker.ADD
-            m.scale.x = 1.0
-            m.scale.y = 1.0
-            m.scale.z = 1.0
+            m.scale.x = 0.1
+            m.scale.y = 0.1
+            m.scale.z = 0.1
             m.color.a = 1.0
             m.color.r = 1.0
             m.id = i
@@ -50,7 +50,7 @@ class MarkerPublisher(Node):
                 l.header.frame_id = "base_link"
                 l.type = Marker.LINE_STRIP
                 l.action = Marker.ADD
-                l.scale.x = 0.5
+                l.scale.x = 0.1
                 l.color.a = 1.0
                 l.color.r = red
                 l.color.b = blue

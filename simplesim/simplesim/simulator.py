@@ -1,5 +1,3 @@
-from .random_waypoints_generator import *
-
 from sim_msgs.msg import Waypoints
 from sim_msgs.msg import DroneResults
 from geometry_msgs.msg import PoseStamped
@@ -39,25 +37,25 @@ wps_to_travel = []
 
 ## CHANGE SUBSCRIBER
 
-class ChangeSubscriber(Node):
-    def __init__(self):
-        super().__init__('change')
+# class ChangeSubscriber(Node):
+#     def __init__(self):
+#         super().__init__('change')
 
-        self.subscription = self.create_subscription(
-            Waypoints,
-            '/change',
-            self.change,
-            10)
-        self.subscription
-        self.get_logger().info(' ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ SUBS INICIADO')
+#         self.subscription = self.create_subscription(
+#             Waypoints,
+#             '/change',
+#             self.change,
+#             10)
+#         self.subscription
+        # self.get_logger().info(' ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ SUBS INICIADO')
 
-    def change(self, msg):
+#     def change(self, msg):
 
-        new_point = [msg.wps[0]]
+#         new_point = [msg.wps[0]]
 
-        alert_change_route(new_point)
+#         alert_change_route(new_point)
 
-        self.get_logger().info(' ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ mensaje recibido')
+        # self.get_logger().info(' ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ mensaje recibido')
 
 
 class Publisher(Node):
@@ -70,7 +68,9 @@ class Publisher(Node):
 
         super().__init__('simulator')
 
-        self.publisher_ = self.create_publisher(PoseStamped, 'pose', 1)
+        self.get_logger().info("PUBLISHER")
+
+        self.publisher_ = self.create_publisher(PoseStamped, 'pose', 10)
 
         MAX_SPEED = self.declare_parameter(
             'max_speed', 20.0).get_parameter_value().double_value
@@ -98,20 +98,22 @@ class Publisher(Node):
         # Calculate direction of first waypoint
         current_direction = calculate_direction(current_wp, wps_to_travel[0])
 
-        self.print_vec(current_direction)
+        # self.print_vec(current_direction)
+
+        self.get_logger().info("START")
 
         for next_wp in wps_to_travel[:-1]:
-            for wp in wps_to_travel: self.print_point(wp)
+            # for wp in wps_to_travel: self.print_point(wp)
             saved_current_wp = current_wp
             subsequent = wps_to_travel[wps_to_travel.index(next_wp)+1]
 
             current_wp = self.approach(current_wp, next_wp, subsequent)
-            self.get_logger().info('*** CURRENT NEXT POINTS:')
-            self.print_point(saved_current_wp)
-            self.print_point(next_wp)
-            self.print_point(subsequent)
+            # self.get_logger().info('*** CURRENT NEXT POINTS:')
+            # self.print_point(saved_current_wp)
+            # self.print_point(next_wp)
+            # self.print_point(subsequent)
             angle = calculate_angle(saved_current_wp, next_wp, subsequent)
-            self.get_logger().info(f'ANGLE: {angle}')
+            # self.get_logger().info(f'ANGLE: {angle}')
             current_wp = self.overtake(current_wp, subsequent)
         self.finish(current_wp, wps_to_travel[-1]) # Last point
 
@@ -121,7 +123,7 @@ class Publisher(Node):
 
 
         self.get_logger().info(f'TOTAL TIME: {TIME_SPENT:.3f}')
-        self.get_logger().info(f'TIMES: {times}')
+        # self.get_logger().info(f'TIMES: {times}')
         self.get_logger().info(f'TOTAL DISTANCE: {TOTAL_DISTANCE:.3f}')
 
     def approach(self, current, next_wp, subsequent) -> PoseStamped:
@@ -129,7 +131,7 @@ class Publisher(Node):
         Approaches next point from
         current point in a straight line
         """
-        self.get_logger().info("*** APPROACH ***")
+        # self.get_logger().info("*** APPROACH ***")
 
         global current_speed
         global current_direction
@@ -139,15 +141,15 @@ class Publisher(Node):
         global CHANGE_ROUTE
 
         current_direction = calculate_direction(current, next_wp)
-        self.print_point(current)
-        self.print_point(next_wp)
-        self.print_point(subsequent)
+        # self.print_point(current)
+        # self.print_point(next_wp)
+        # self.print_point(subsequent)
         curr_time = 0
         previous_speed = current_speed
         near_point = (calculate_near_point(calculate_overtake_speed(calculate_angle(current, next_wp, subsequent)), MAX_SPEED))/3.5
-        self.get_logger().info(f'Vf: {calculate_overtake_speed(calculate_angle(current, next_wp, subsequent))} Vi: {MAX_SPEED}')
+        # self.get_logger().info(f'Vf: {calculate_overtake_speed(calculate_angle(current, next_wp, subsequent))} Vi: {MAX_SPEED}')
         in_point = 0.2
-        self.get_logger().info(f'NEAR POINT CALCULATED: {near_point + in_point}')
+        # self.get_logger().info(f'NEAR POINT CALCULATED: {near_point + in_point}')
         while distance(current, next_wp) > in_point:
             if CHANGE_ROUTE:
                 return self.change_route()
@@ -162,11 +164,12 @@ class Publisher(Node):
                 # publisher.get_logger().info("ANGLE")
                 # publisher.get_logger().info(f'{angle}')
                 # current_speed = calculate_speed(acceleration_with_goal_speed(lerp(previous_speed, calculate_overtake_speed(angle), curr_time)))
-                self.get_logger().info("OVERTAKE SPEED")
-                self.get_logger().info(str(calculate_overtake_speed(angle)))
-                self.get_logger().info("CURRENT SPEED")
-                self.get_logger().info(str(current_speed))
-                current_speed = calculate_speed(self.acceleration_with_goal_speed(lerp(previous_speed, calculate_overtake_speed(angle), curr_time)))
+                # self.get_logger().info("OVERTAKE SPEED")
+                # self.get_logger().info(str(calculate_overtake_speed(angle)))
+                # self.get_logger().info("CURRENT SPEED")
+                # self.get_logger().info(str(current_speed))
+                # current_speed = calculate_speed(self.acceleration_with_goal_speed(lerp(previous_speed, calculate_overtake_speed(angle), curr_time)))
+                current_speed = calculate_speed(self.acceleration_with_goal_speed(calculate_overtake_speed(angle)))
                 
                 # self.get_logger().info("CALCULATE DEACCELERATION")
                 # self.get_logger().info(str(acceleration_with_goal_speed(calculate_overtake_speed(angle))))
@@ -204,7 +207,7 @@ class Publisher(Node):
             TIME_SPENT += TIME_STEP
             time.sleep(TIME_STEP)
 
-        self.get_logger().info("****** OUT OF APPROACH")
+        # self.get_logger().info("****** OUT OF APPROACH")
         return current
     
     def overtake(self, current, next_wp) -> PoseStamped:
@@ -213,7 +216,7 @@ class Publisher(Node):
         drone towards next point
         """
 
-        self.get_logger().info("*** OVERTAKE ***")
+        # self.get_logger().info("*** OVERTAKE ***")
 
         global current_speed
         global current_direction
@@ -225,16 +228,16 @@ class Publisher(Node):
 
         if(CHANGE_ROUTE): CHANGE_ROUTE = False; return current
 
-        self.print_point(current)
-        self.print_point(next_wp)
+        # self.print_point(current)
+        # self.print_point(next_wp)
 
         next_direction = calculate_direction(current, next_wp)
 
         current_speed = calculate_speed(self.acceleration_with_goal_speed(0.2))
 
         i = 0
-        self.print_vec(current_direction)
-        self.print_vec(next_direction)
+        # self.print_vec(current_direction)
+        # self.print_vec(next_direction)
         while i < 0.3:
             new_current_direction = slerp(current_direction, next_direction, i)
             i = i + TIME_STEP
@@ -269,7 +272,7 @@ class Publisher(Node):
             TIME_SPENT += TIME_STEP
             time.sleep(TIME_STEP)
 
-        self.get_logger().info(f'CURRENT TIME: {TIME_SPENT - TIME_BETWEEN_WPS}')
+        # self.get_logger().info(f'CURRENT TIME: {TIME_SPENT - TIME_BETWEEN_WPS}')
         times.append(TIME_SPENT - TIME_BETWEEN_WPS)
         TIME_BETWEEN_WPS = TIME_SPENT
         current_direction = new_current_direction
@@ -327,7 +330,7 @@ class Publisher(Node):
 
             TIME_SPENT += TIME_STEP
             time.sleep(TIME_STEP)
-        self.get_logger().info(f'CURRENT TIME: {TIME_SPENT - TIME_BETWEEN_WPS}')
+        # self.get_logger().info(f'CURRENT TIME: {TIME_SPENT - TIME_BETWEEN_WPS}')
         times.append(TIME_SPENT - TIME_BETWEEN_WPS)
         TIME_BETWEEN_WPS = TIME_SPENT
 
@@ -336,11 +339,11 @@ class Publisher(Node):
         Calculates acceleration needed for certain speed goal
         """
         global current_speed
-        self.get_logger().info(str(goal))
-        self.get_logger().info(str(current_speed))
-        self.get_logger().info(str(goal-current_speed))
-        self.get_logger().info(str(goal-current_speed/TIME_STEP))
-        self.get_logger().info(str(MAX_ACCELERATION))
+        # self.get_logger().info(str(goal))
+        # self.get_logger().info(str(current_speed))
+        # self.get_logger().info(str(goal-current_speed))
+        # self.get_logger().info(str(goal-current_speed/TIME_STEP))
+        # self.get_logger().info(str(MAX_ACCELERATION))
         a = (goal - current_speed)/TIME_STEP
         if a > MAX_ACCELERATION:
             return MAX_ACCELERATION
@@ -375,7 +378,7 @@ class Publisher(Node):
             TOTAL_DISTANCE += magnitude
 
             print("POSITION")
-            self.print_point(next_pose)
+            # self.print_point(next_pose)
             print("")
             next_pose.header.frame_id = "base_link"
 
@@ -425,35 +428,39 @@ class Publisher(Node):
 
         return current
 
-    def print_vec(self, v):
-        self.get_logger().info(f"[{v.x},{v.y},{v.z}]")
+    # def print_vec(self, v):
+        # self.get_logger().info(f"[{v.x},{v.y},{v.z}]")
 
-    def print_point(self, a):
-        self.get_logger().info(f"({a.pose.position.x},{a.pose.position.y},{a.pose.position.z})")
+    # def print_point(self, a):
+        # self.get_logger().info(f"({a.pose.position.x},{a.pose.position.y},{a.pose.position.z})")
 
 class PathPublisher(Node):
     def __init__(self):
         super().__init__('path')
 
-        self.publisher_ = self.create_publisher(Path, 'path', 1)
+        self.publisher_ = self.create_publisher(Path, 'path', 10)
 
 class Subscriber(Node):
     def __init__(self):
         super().__init__('sim_listener')
 
-        self.subscription = self.create_subscription(Waypoints,'wps', self.startup, 1)
+        self.get_logger().info("SUBSCRIBER")
+
+        self.subscription = self.create_subscription(Waypoints,'wps', self.startup, 10)
         self.subscription
 
     def startup(self,msg):
+        self.get_logger().info("RECEIVED")
         wps = msg.wps
-        pose_publisher = Publisher(wps)
+        pose_publisher = Publisher(wps) 
+        self.destroy_subscription(self.subscription)
         # rclpy.spin(pose_publisher)
 
 class ResultsPublisher(Node):
     def __init__(self, t_time, t_distance):
         super().__init__('results_publisher')
 
-        self.publisher_ = self.create_publisher(DroneResults,'/drone_results', 1)
+        self.publisher_ = self.create_publisher(DroneResults,'/drone_results', 10)
 
         global DRONE_ID
         
@@ -461,7 +468,7 @@ class ResultsPublisher(Node):
         dr.drone_id = DRONE_ID
         dr.total_time = t_time
         dr.total_distance = t_distance
-        self.get_logger().info('RESULTS SENT {DRONE_ID}')
+        # self.get_logger().info('RESULTS SENT {DRONE_ID}')
 
         self.publisher_.publish(dr)
 
@@ -616,7 +623,8 @@ def lerp(a: float, b: float, t: float) -> float:
     return (1 - t) * a + t * b
 
 def calculate_near_point(vf, vi) -> float:
-    return abs(vf**2 - vi**2)/(2*(MAX_ACCELERATION*0.85))
+    # return abs(vf**2 - vi**2)/(2*(MAX_ACCELERATION*0.85))
+    return abs(vf**2 - vi**2)/(1.5*(MAX_ACCELERATION))
 
 def alert_change_route(new_point):
     global change_new_point
@@ -641,3 +649,4 @@ def main():
 
     rclpy.shutdown()
     # rclpy.spin(path_publisher)
+

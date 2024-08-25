@@ -78,6 +78,27 @@ def generate_launch_description():
         name='wps'
     )
 
+    change_sub = launch_ros.actions.Node(
+        namespace=drone_id,
+        package='simplesim',
+        executable='change_sub',
+        name='change_subscriptor'
+    )
+
+    poses = os.path.join(
+        get_package_share_directory('simplesim'),
+        'waypoints',
+        'crazyflies_2_2_rosbag.yaml'
+    )
+
+    replicator = launch_ros.actions.Node(
+        namespace='replicator',
+        package='simplesim',
+        executable='replicator',
+        name='replicator',
+        parameters=[poses]
+    )
+
     return launch.LaunchDescription([
         drone_id_launch_arg,
         drone_wps_launch_arg,
@@ -86,6 +107,8 @@ def generate_launch_description():
         # fp,
         opaque_f_config,
         wps,
+        # change_sub,
+        # replicator
         # ExecuteProcess(cmd=['echo', str(drone_wps_str) + str(entered) + ' + ' + str(drone_config_str) + str(entered2)],
                     #    output='screen'),
     ])

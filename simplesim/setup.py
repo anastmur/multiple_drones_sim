@@ -29,7 +29,11 @@ setup(
         'console_scripts': [
             'controller = simplesim.controller:main',
             'simulator = simplesim.simulator:main',
-            'wp_vis = simplesim.wp_visualizer:main'
+            'wp_vis = simplesim.wp_visualizer:main',
+            'listener = simplesim.listener:main',
+            'replicator = simplesim.replicator:main',
+            'change_sub = simplesim.change_sub:main',
+            'change_pub = simplesim.change_pub:main',
         ],
     },
 )

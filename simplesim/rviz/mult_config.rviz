@@ -10,7 +10,7 @@ Visualization Manager:
       Value: true
       Plane Cell Count: 60
       Cell Size: 20
-      Color: 84;84;86
+      Color: 150;150;150
 
     - Alpha: 0.8
       Class: rviz_default_plugins/RobotModel
@@ -28,7 +28,6 @@ Visualization Manager:
       Axes Radius: 1
       Value: true
       Topic: drone_0/pose
-      Color: (0,0,0)
     - Class: rviz_default_plugins/Marker
       Name: Marker
       Topic: drone_0/marker
@@ -84,7 +83,40 @@ Visualization Manager:
       Name: Path
       Topic: path_1
       Value: True
+    - Class: rviz_default_plugins/Pose
+      Name: Pose
+      Shape: Axes
+      Axes Length: 2
+      Axes Radius: 1
+      Value: true
+      Topic: straight_line/pose
+      Color: (255,255,255)
+    - Class: rviz_default_plugins/Marker
+      Name: Marker
+      Topic: straight_line/marker
+      Value: True
+    - Class: rviz_default_plugins/PointStamped
+      Name: PointStamped
+      Topic: straight_line/point
+      Value: True
+      Radius: 0.5
+    - Class: rviz_default_plugins/Path
+      Name: Path
+      Topic: straight_line
+      Value: True
+    - Class: rviz_default_plugins/Pose
+      Name: Pose
+      Shape: Arrow
+      Color: 0;0;255
+      Shaft Length: 0.2
+      Shaft Radius: 0.2
+      Head Length: 0
+      Head Radius: 0
+      Value: true
+      Topic: replicator/pose
+
   Global Options:
+    Background Color: 255; 255; 255
     Fixed Frame: base_link
   Tools:
     - Class: rviz_default_plugins/MoveCamera

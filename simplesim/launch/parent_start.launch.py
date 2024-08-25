@@ -11,7 +11,7 @@ from ament_index_python.packages import get_package_share_directory
 
 def generate_launch_description():
 
-    config_file = 'mult_config.rviz'
+    config_file = 'zoomed_orbit.rviz'
     config = os.path.join(
         get_package_share_directory('simplesim'),
         'rviz',
@@ -25,6 +25,35 @@ def generate_launch_description():
         arguments=['-d' + config]
     )
 
+    straight_line = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource([
+            PathJoinSubstitution([
+                FindPackageShare('simplesim'),
+                'launch',
+                'start_drone.launch.py'
+            ])
+        ]),
+        launch_arguments={
+            'drone_id': 'straight_line',
+            'drone_config':'straight_line.yaml',
+            'drone_wps': 'straight_line.yaml'
+        }.items()
+    )
+
+    drone_0_c = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource([
+            PathJoinSubstitution([
+                FindPackageShare('simplesim'),
+                'launch',
+                'start_drone.launch.py'
+            ])
+        ]),
+        launch_arguments={
+            'drone_id': 'drone_0',
+            'drone_config':'crazyfly.yaml',
+            'drone_wps': 'crazyflies_2_2_3_path.yaml'
+        }.items()
+    )
     drone_0 = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([
             PathJoinSubstitution([
@@ -67,9 +96,22 @@ def generate_launch_description():
         }.items()
     )
 
+    replicator = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource([
+            PathJoinSubstitution([
+                FindPackageShare('simplesim'),
+                'launch',
+                'replicator_launch.py'
+            ])
+        ])
+    )
+
     return LaunchDescription([
-            rviz_node,
-            drone_0,
+            # rviz_node,
+            # straight_line,
+            drone_0_c,
+            # drone_0,
             # drone_1,
             # drone_2
+            # replicator
         ])

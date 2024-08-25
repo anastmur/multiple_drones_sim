@@ -11,20 +11,28 @@ class WpsPublisher(Node):
         self.drone_wps = self.declare_parameter(
             'waypoints', ['nun']).get_parameter_value().string_array_value
         
-        self.get_logger().info(f'drone_wps: {str(self.drone_wps)}')
+        # self.get_logger().info(f'drone_wps: {str(self.drone_wps)}')
 
-        self.publisher_ = self.create_publisher(Waypoints, 'wps', 1)
+        self.get_logger().info(f'CONTROLLER PUBLISHER')
+
+        self.publisher_ = self.create_publisher(Waypoints, 'wps', 10)
         self.send_msg(self.drone_wps)
 
     def send_msg(self, drone_wps):
         wps = self.process_waypoints(drone_wps)
 
-        time.sleep(0.5)
+        # time.sleep(0.5)
 
         wps_msg = Waypoints()
         wps_msg.wps = wps
 
-        self.publisher_.publish(wps_msg)
+
+        # self.publisher_.publish(wps_msg)
+        self.get_logger().info(f'SENDING MESSAGE')
+
+        while(True):
+            self.publisher_.publish(wps_msg)
+            # time.sleep(0.1)
 
     def process_waypoints(self, drone_wps):
         '''
@@ -34,10 +42,10 @@ class WpsPublisher(Node):
         for waypoint_array in drone_wps:
             if isinstance(waypoint_array, str):
                 waypoint = waypoint_array.split(";")
-                self.get_logger().info('Waypoints in String format')
+                # self.get_logger().info('Waypoints in String format')
             else:
                 waypoint = waypoint_array
-                self.get_logger().info('Waypoints in array format')
+                # self.get_logger().info('Waypoints in array format')
             x = float(waypoint[0])
             y = float(waypoint[1])
             z = float(waypoint[2])
@@ -57,8 +65,8 @@ def main():
     rclpy.init()
     wps_publisher = WpsPublisher()
     rclpy.spin(wps_publisher)
-    wps_publisher.destroy_node()
-    rclpy.shutdown()
+    # wps_publisher.destroy_node()
+    # rclpy.shutdown()
 
 if __name__ == '__main__':
     main()

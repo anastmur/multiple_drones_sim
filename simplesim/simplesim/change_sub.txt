@@ -1,0 +1,36 @@
+import rclpy
+from rclpy.node import Node
+from sim_msgs.msg import Waypoints
+
+from .simulator import alert_change_route
+
+class ChangeSubscriber(Node):
+    def __init__(self):
+        super().__init__('change')
+
+        self.subscription = self.create_subscription(
+            Waypoints,
+            '/change',
+            self.change,
+            10)
+        self.subscription
+        self.get_logger().info(' ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ SUBS INICIADO')
+
+    def change(self, msg):
+
+        new_point = [msg.wps[0]]
+
+        alert_change_route(new_point)
+
+        self.get_logger().info(' ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ mensaje recibido')
+
+
+def main():
+    rclpy.init()
+    change_subscriber = ChangeSubscriber()
+    rclpy.spin(change_subscriber)
+    change_subscriber.destroy_node()
+    rclpy.shutdown()
+
+if __name__ == '__main__':
+    main()

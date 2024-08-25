@@ -1,0 +1,37 @@
+import rclpy
+from rclpy.node import Node
+from sim_msgs.msg import Waypoints
+from geometry_msgs.msg import PoseStamped
+
+class ChangePublisher(Node):
+    def __init__(self):
+        super().__init__('change')
+
+        self.publisher_ = self.create_publisher(Waypoints,'/change', 10)
+
+        wp = Waypoints()
+        wp.wps = []
+
+        redirect = PoseStamped()
+
+        redirect.pose.position.x = 0.0
+        redirect.pose.position.y = 0.0
+        redirect.pose.position.z = 0.0
+
+        wp.wps.append(redirect)
+
+        self.get_logger().info(' ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ PUBLICANDING')
+
+
+        self.publisher_.publish(wp)
+
+
+def main():
+    rclpy.init()
+    change_publisher = ChangePublisher()
+    rclpy.spin(change_publisher)
+    change_publisher.destroy_node()
+    rclpy.shutdown()
+
+if __name__ == '__main__':
+    main()
